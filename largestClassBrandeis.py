@@ -3,13 +3,16 @@ import time
 try:
 	import winsound
 	sound = True
-except:
+except ImportError:
 	sound = False
 
 import pickle
+try:
+	from tabulate import tabulate
+except ImportError:
+	tabulate = lambda *args,**kwargs: args[0]
 
-
-driver = webdriver.Chrome()
+driver = webdriver.PhantomJS()
 link = "https://brandeis.schdl.net/term/Spring_2017"
 
 driver.get(link)
@@ -58,12 +61,12 @@ for i in range(3): # for each column (there are three - bad that this is hardcod
 	driver.get(link)
 driver.quit()
 
-sorted_classes_section = sorted(classes_section, key=lambda x:x[0])
-print(sorted_classes_section)
-sorted_classes_total = sorted(classes_total, key=lambda x:x[0])
-if sound: winsound.MessageBeep()
-input()
-print(sorted_classes_total)
+sorted_classes_section = sorted(classes_section, key=lambda x:x[0], reverse=True)
+print(tabulate(sorted_classes_section[:25], headers=["Number of people", "Course", "Section"]))
+sorted_classes_total = sorted(classes_total, key=lambda x:x[0], reverse=True)
+#if sound: winsound.MessageBeep()
+#input("Press enter to continue")
+print(tabulate(sorted_classes_total[:25], headers=["Number of people", "Course"]))
 
 with open("classes_by_section.pickle", "wb") as classes_by_section:
 	pickle.dump(sorted_classes_section, classes_by_section)
